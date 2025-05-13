@@ -2,8 +2,23 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
-class CustomUser(AbstractUser):
-    email = models.EmailField(_('email address'), unique=True)
+class Users(AbstractUser):
+    email = models.EmailField('Электронная почта', unique=True)
+
+    groups = models.ManyToManyField(
+        'auth.Group',
+        verbose_name='Группы',
+        blank=True,
+        related_name='custom_users',
+        related_query_name='custom_user',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='Права доступа',
+        blank=True,
+        related_name='custom_users',
+        related_query_name='custom_user',
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
