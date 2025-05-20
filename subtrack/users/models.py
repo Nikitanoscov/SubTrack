@@ -35,7 +35,6 @@ class CustomUserManager(DjangoUserManager):
 class Users(AbstractUser):
     email = models.EmailField('Электронная почта', unique=True)
     username = None
-
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name='Группы',
@@ -50,10 +49,14 @@ class Users(AbstractUser):
         related_name='custom_users',
         related_query_name='custom_user',
     )
+    is_verify = models.BooleanField(
+        'Подтверждена ли учетная запись',
+        default=False
+    )
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
-    
+
     objects = CustomUserManager()
 
     def __str__(self):
