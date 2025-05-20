@@ -1,0 +1,34 @@
+[
+    {
+        "model": "subscriptions.subscriptionstypes",
+        "pk": 3,
+        "fields": {
+            "name": "Игры",
+            "slug": "Games"
+        }
+    },
+    {
+        "model": "subscriptions.subscriptionstypes",
+        "pk": 4,
+        "fields": {
+            "name": "Работа",
+            "slug": "works"
+        }
+    },
+    {
+        "model": "subscriptions.subscriptionstypes",
+        "pk": 5,
+        "fields": {
+            "name": "Развлечение",
+            "slug": "entertainment"
+        }
+    },
+    {
+        "model": "subscriptions.subscriptionstypes",
+        "pk": 6,
+        "fields": {
+            "name": "Обучение",
+            "slug": "education"
+        }
+    }
+]
