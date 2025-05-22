@@ -2,6 +2,7 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils import timezone
+from dateutil import relativedelta
 
 
 Users = get_user_model()
@@ -102,5 +103,13 @@ class Subscriptions(models.Model):
     def is_trial(self):
         pass
 
+    @property
     def end_date(self):
-        pass
+        if self.frequency_month == '0':
+            return None
+
+        try:
+            months = int(self.frequency_month)
+            return self.start_date + relativedelta(months=months)
+        except (ValueError, TypeError):
+            return None
