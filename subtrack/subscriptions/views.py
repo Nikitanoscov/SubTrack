@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import api_view
 
 from .models import SubscriptionsTypes, Subscriptions
@@ -11,6 +11,7 @@ from .serializers import (
     SubscriptionsListSerializer,
     SubscriptionsUpdateSerializer
 )
+from .permissions import IsAuthor
 
 
 @api_view(('GET',))
@@ -34,6 +35,10 @@ class TypesListView(ListAPIView):
 class SubscriptionsViewSet(viewsets.ModelViewSet):
     queryset = Subscriptions.objects.all()
     serializer_class = SubscriptionsDetailSerializer
+    permission_classes = [
+        permissions.IsAuthenticated,
+        IsAuthor
+    ]
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ('partial_update'):
