@@ -9,7 +9,20 @@ Users = get_user_model()
 
 
 class SubscriptionsManager(models.Manager):
-    pass
+
+    def with_end_date(self):
+        return self.annotate(
+            end_date=models.Case(
+                models.When(frequency_month='0', then=models.Value(None)),
+                default=models.Cast(
+                    models.F('start_date') + relativedelta(
+                        models.F('frequency_month')
+                    )
+                ),
+                output_field=models.DateField()
+            ),
+            output_field=models.DateField()
+        )
 
 
 class SubscriptionsTypes(models.Model):
@@ -77,8 +90,6 @@ class Subscriptions(models.Model):
     )
     trial_period_days = models.PositiveSmallIntegerField(
         verbose_name='Пробный период подписки',
-        blank=True,
-        null=True,
         default=0
     )
     notify_before_days = models.SmallIntegerField(
@@ -90,6 +101,8 @@ class Subscriptions(models.Model):
         verbose_name='Авто продление',
         default=False
     )
+
+    objects = SubscriptionsManager()
 
     class Meta:
         verbose_name = 'Подписка'
