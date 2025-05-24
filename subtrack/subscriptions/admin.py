@@ -24,7 +24,6 @@ class subscriptionsAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'sub_name',
-        'user_email'
     )
     list_filter = ('type', 'status')
 
