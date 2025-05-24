@@ -3,6 +3,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import api_view
+from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import SubscriptionsTypes, Subscriptions
 from .serializers import (
@@ -39,13 +40,25 @@ class SubscriptionsViewSet(viewsets.ModelViewSet):
         permissions.IsAuthenticated,
         IsAuthor
     ]
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('status',)
+
+    def get_queryset(self):
+        queryset = Subscriptions.objects.filter(
+            user=self.request.user
+        ).order_by('-price')
+        type = self.request.GET.get('type', '')
+        print(type)
+        if type:
+            queryset = queryset.filter(type__name=type)
+        return queryset
 
     def get_serializer_class(self, *args, **kwargs):
         if self.action in ('partial_update'):
             return SubscriptionsUpdateSerializer
         elif self.action in ('list'):
             return SubscriptionsListSerializer
-        return super().get_serializer(*args, **kwargs)
+        return super().get_serializer_class(*args, **kwargs)
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.get_object()
