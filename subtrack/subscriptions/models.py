@@ -1,8 +1,10 @@
+from datetime import datetime, timedelta
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models.functions import Cast
 from django.utils import timezone
-from dateutil import relativedelta
+from dateutil.relativedelta import relativedelta
 
 
 Users = get_user_model()
@@ -14,14 +16,14 @@ class SubscriptionsManager(models.Manager):
         return self.annotate(
             end_date=models.Case(
                 models.When(frequency_month='0', then=models.Value(None)),
-                default=models.Cast(
+                default=Cast(
                     models.F('start_date') + relativedelta(
                         models.F('frequency_month')
-                    )
+                    ),
+                    output_field=models.DateField()
                 ),
                 output_field=models.DateField()
-            ),
-            output_field=models.DateField()
+            )
         )
 
 
@@ -76,8 +78,7 @@ class Subscriptions(models.Model):
         related_name='subscriptions'
     )
     start_date = models.DateField(
-        verbose_name='Дата начала подписки',
-        default=timezone.now
+        verbose_name='Дата начала подписки'
     )
     frequency_month = models.CharField(
         verbose_name='Переодичность подписки',
@@ -107,6 +108,7 @@ class Subscriptions(models.Model):
     class Meta:
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
+        unique_together = [['user', 'sub_name']]
 
     @property
     def is_active(self):
@@ -118,11 +120,28 @@ class Subscriptions(models.Model):
 
     @property
     def end_date(self):
-        if self.frequency_month == '0':
-            return None
-
         try:
-            months = int(self.frequency_month)
-            return self.start_date + relativedelta(months=months)
-        except (ValueError, TypeError):
+            if self.status == 'active':
+                if self.frequency_month == '0':
+                    return None
+                month = int(self.frequency_month)
+
+                now = datetime.now().date()
+                current = self.start_date + relativedelta(months=month)
+                while current <= now:
+                    print(current)
+                    current = current + relativedelta(months=month)
+                return current
+            elif self.status == 'trial':
+                days_passed = relativedelta(
+                    datetime.now(), self.start_date
+                ).days
+                start_date = self.start_date + relativedelta(days=days_passed)
+                days = int(self.trial_period_days)
+                result = self.start_date + relativedelta(days=days)
+            else:
+                return None
+            return result
+        except (ValueError, TypeError) as err:
+            print(err)
             return None
