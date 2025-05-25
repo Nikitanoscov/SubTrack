@@ -3,7 +3,6 @@ from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models.functions import Cast
-from django.utils import timezone
 from dateutil.relativedelta import relativedelta
 
 
@@ -55,6 +54,7 @@ class Subscriptions(models.Model):
     STATUS_CHOICES = (
         ('trial', 'Пробный период'),
         ('active', 'Активна'),
+        ('expired', 'Истекла'),
         ('cancelled', 'Отменена'),
     )
 
@@ -111,14 +111,6 @@ class Subscriptions(models.Model):
         unique_together = [['user', 'sub_name']]
 
     @property
-    def is_active(self):
-        pass
-
-    @property
-    def is_trial(self):
-        pass
-
-    @property
     def end_date(self):
         try:
             if self.status == 'active':
@@ -129,7 +121,6 @@ class Subscriptions(models.Model):
                 now = datetime.now().date()
                 current = self.start_date + relativedelta(months=month)
                 while current <= now:
-                    print(current)
                     current = current + relativedelta(months=month)
                 return current
             elif self.status == 'trial':
@@ -143,5 +134,7 @@ class Subscriptions(models.Model):
                 return None
             return result
         except (ValueError, TypeError) as err:
-            print(err)
             return None
+
+    def __str__(self):
+        return self.sub_name
