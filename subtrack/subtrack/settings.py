@@ -1,15 +1,24 @@
 from datetime import timedelta
 from pathlib import Path
+import os
+
+from celery.schedules import crontab
+
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+dotenv_path = BASE_DIR / '.env'
+
+load_dotenv()
+
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-x^zof*&dk0ju%u+cc$nx=pj*()7r%!h2)(m@19!&!)x@$=%9@p'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-x^zof*&dk0ju%u+cc$nx=pj*()7r%!h2)(m@19!&!)x@$=%9@p')
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = os.getenv('HOSTS_PROJECT', '*').split(' ')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -21,6 +30,7 @@ INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'users.apps.UsersConfig',
     'subscriptions.apps.SubscriptionsConfig',
+    'celery_tasks.apps.CeleryTasksConfig',
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
@@ -128,3 +138,16 @@ EMAIL_FILE_PATH = BASE_DIR / 'sent_emails'
 DEFAULT_FROM_EMAIL = 'nnnnn@mail.ru'
 
 SITE_NAME = "SubTrack"
+
+CELERY_BROKER_URL = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = "Europe/Moscow"
+CELERY_BEAT_SCHEDULE = {
+    'check-subscriptions-every-day': {
+        'task': 'celery_tasks.tasks.subscriptions_notification',
+        'schedule':  timedelta(minutes=1),
+    },
+}
