@@ -10,17 +10,16 @@ class UserAdmin(BaseUserAdmin):
     list_display = (
         'email',
         'is_active',
-        'is_verify',
     )
     list_filter = (
-        'is_verify',
+        'is_active',
     )
     ordering = ('email',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Персональная информация', {'fields': ()}),
         ('Разрешения', {
-            'fields': ('is_active', 'is_staff', 'is_superuser', 'is_verify')
+            'fields': ('is_active', 'is_staff', 'is_superuser',)
         }),
         ('Даты', {'fields': ('last_login', 'date_joined')}),
     )

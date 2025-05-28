@@ -14,7 +14,7 @@ router.register(
 
 
 urlpatterns = [
-    path('category/', TypesListView.as_view(), name='category-list'),
+    path('types/', TypesListView.as_view(), name='types-list'),
     path('status/', status_list, name='status-list'),
     path('', include(router.urls))
 ]

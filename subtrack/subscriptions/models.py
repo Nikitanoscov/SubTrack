@@ -41,7 +41,6 @@ class SubscriptionsTypes(models.Model):
 
 
 class Subscriptions(models.Model):
-
     # возможные поля для периодичности
     FREQUENCY_CHOICES = (
         ('1', '1 Месяц'),
@@ -133,7 +132,7 @@ class Subscriptions(models.Model):
             else:
                 return None
             return result
-        except (ValueError, TypeError) as err:
+        except (ValueError, TypeError):
             return None
 
     def __str__(self):
