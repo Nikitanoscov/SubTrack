@@ -1,5 +1,5 @@
 from django.urls import include, path
-from djoser.views import UserViewSet
+from .views import UserViewSet
 
 
 urlpatterns = [

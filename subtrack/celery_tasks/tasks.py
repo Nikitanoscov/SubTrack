@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from celery import shared_task
 from django.core.mail import send_mail
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 

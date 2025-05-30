@@ -10,6 +10,7 @@ admin.site.register(SubscriptionsTypes)
 @admin.register(Subscriptions)
 class subscriptionsAdmin(admin.ModelAdmin):
     list_display = (
+        'id',
         'sub_name',
         'get_user_email',
         'price',

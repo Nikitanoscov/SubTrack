@@ -108,6 +108,7 @@ class Subscriptions(models.Model):
         verbose_name = 'Подписка'
         verbose_name_plural = 'Подписки'
         unique_together = [['user', 'sub_name']]
+        ordering = ['id']
 
     @property
     def end_date(self):

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status, viewsets, permissions
 from rest_framework.decorators import api_view
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema
 
 from .models import SubscriptionsTypes, Subscriptions
 from .serializers import (
@@ -15,6 +16,7 @@ from .serializers import (
 from .permissions import IsAuthor
 
 
+@extend_schema(tags=["Подписки"])
 @api_view(('GET',))
 def status_list(request):
     status_choices = Subscriptions.STATUS_CHOICES
@@ -28,11 +30,13 @@ def status_list(request):
     )
 
 
+@extend_schema(tags=["Подписки"])
 class TypesListView(ListAPIView):
     queryset = SubscriptionsTypes.objects.all()
     serializer_class = TypesSerializer
 
 
+@extend_schema(tags=["Подписки"])
 class SubscriptionsViewSet(viewsets.ModelViewSet):
     queryset = Subscriptions.objects.all()
     serializer_class = SubscriptionsDetailSerializer
@@ -48,7 +52,6 @@ class SubscriptionsViewSet(viewsets.ModelViewSet):
             user=self.request.user
         ).order_by('-price')
         type = self.request.GET.get('type', '')
-        print(type)
         if type:
             queryset = queryset.filter(type__name=type)
         return queryset
@@ -71,4 +74,3 @@ class SubscriptionsViewSet(viewsets.ModelViewSet):
         updated_instance = serializer.save()
         detail_serializer = SubscriptionsDetailSerializer(updated_instance)
         return Response(detail_serializer.data, status=status.HTTP_200_OK)
-
